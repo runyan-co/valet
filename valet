@@ -77,7 +77,7 @@ then
 
 	# Fetch Ngrok URL In Background...
 	bash "$DIR/cli/scripts/fetch-share-url.sh" "$HOST" &
-    
+
 	sudo -u "$USER" "$DIR/bin/ngrok" http "$HOST.$TLD:$PORT" -host-header=rewrite $PARAMS
     exit
 

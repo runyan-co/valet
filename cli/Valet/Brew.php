@@ -376,7 +376,7 @@ class Brew
     function getRunningServices()
     {
         return collect(array_filter(explode(PHP_EOL, $this->cli->runAsUser(
-            'brew services list | grep started | awk \'{ print $1; }\'',
+            'sudo brew services list | grep started | awk \'{ print $1; }\'',
             function ($exitCode, $errorOutput) {
                 output($errorOutput);
 

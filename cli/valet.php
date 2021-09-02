@@ -352,6 +352,7 @@ if (is_dir(VALET_HOME_PATH)) {
             case '':
                 PhpFpm::stopRunning();
                 Nginx::stop();
+                DnsMasq::stop();
 
                 return info('Valet services have been stopped.');
             case 'nginx':

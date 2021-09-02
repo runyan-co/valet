@@ -58,6 +58,13 @@ class DnsMasq
         $this->files->unlink($this->resolverPath.'/'.$tld);
     }
 
+    function stop()
+    {
+        info('Stopping dnsmasq...');
+
+        $this->cli->quietly('sudo brew services stop dnsmasq');
+    }
+
     /**
      * Tell Homebrew to restart dnsmasq
      *
