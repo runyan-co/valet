@@ -72,6 +72,10 @@ if (is_dir(VALET_HOME_PATH)) {
         Configuration::writeBaseConfiguration();
     }
 
+    $app->command('services', function () {
+        table(['Service', 'Status', 'User'], Brew::getAllRunningHomebrewServicesWithUser());
+    })->descriptions('All running homebrew services');
+
     /**
      * Get or set the TLD currently being used by Valet.
      */

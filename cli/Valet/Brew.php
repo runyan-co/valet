@@ -3,6 +3,7 @@
 namespace Valet;
 
 use DomainException;
+use Illuminate\Support\Collection;
 
 class Brew
 {
@@ -366,6 +367,50 @@ class Brew
                 throw new DomainException('Brew was unable to unlink [' . $formula . '].');
             }
         );
+    }
+
+    /**
+     * A hack-y solution to more easily see all running homebrew services by root or
+     * the current user
+     *
+     * @param  callable|null  $callback
+     *
+     * @return array
+     */
+    function getAllRunningHomebrewServicesWithUser(callable $callback = null)
+    {
+        $statuses = collect();
+
+        foreach (['brew services list', 'sudo brew services list'] as $command) {
+            $statuses->push(collect(array_filter(
+                explode(PHP_EOL, $this->cli->runAsUser(
+                    "$command | grep started | awk '{ print $1; print $2; print $3; }'",
+                    function ($exitCode, $errorOutput) {
+                        output($errorOutput);
+
+                        throw new DomainException('Brew was unable to check which services are running.');
+                    }
+                ))
+            ))->chunk(3));
+        }
+
+        $cliTableValues = [];
+
+        foreach ($statuses as $statusByUser) {
+            foreach ($statusByUser as $serviceStatus) {
+                $array = collect($serviceStatus)->values();
+
+                $cliTableValues[] = [
+                    'service' => $array->get(0),
+                    'status' => $array->get(1),
+                    'user' => $array->get(2)
+                ];
+            }
+        }
+
+        return is_callable($callback)
+            ? $callback($cliTableValues)
+            : $cliTableValues;
     }
 
     /**
