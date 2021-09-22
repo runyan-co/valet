@@ -73,7 +73,14 @@ if (is_dir(VALET_HOME_PATH)) {
     }
 
     $app->command('services', function () {
-        $services = Brew::getAllRunningHomebrewServicesWithUser();
+        $services = array_map(function ($row) {
+            $row = \Illuminate\Support\Str::replace('started', '<info>started</info>', $row);
+            $row = \Illuminate\Support\Str::replace('stopped', '<comment>stopped</comment>', $row);
+            $row = \Illuminate\Support\Str::replace('unknown', '<comment>unknown</comment>', $row);
+            $row = \Illuminate\Support\Str::replace('error', '<error>error</error>', $row);
+
+            return $row;
+        }, Brew::getAllRunningHomebrewServicesWithUser());
 
         if (empty($services)) {
             return info('No running services.');
